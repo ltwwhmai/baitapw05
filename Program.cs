@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,7 +10,6 @@ public enum DeviceStatus
     Retired
 }
 
-// Thêm enum cho loại máy in thay vì dùng string
 public enum PrinterType
 {
     Laser,
@@ -26,13 +25,13 @@ public abstract class Device
     public decimal PurchasePrice { get; set; }
     public DeviceStatus Status { get; set; }
 
-    // Chuyển thuộc tính YearsInUse lên lớp Device để GetDevicesRequiringMaintenance có thể truy cập
+   
     public int YearsInUse => DateTime.Now.Year - YearPutIntoUse;
 
     public Device(string id, string name, int yearPutIntoUse, decimal purchasePrice, DeviceStatus status)
     {
         if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Mã thiết bị không được rỗng.");
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Tên thiết bị không được rỗng."); // Thêm validate Name
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Tên thiết bị không được rỗng."); 
         if (purchasePrice <= 0) throw new ArgumentException("Giá mua phải lớn hơn 0.");
         if (yearPutIntoUse > DateTime.Now.Year) throw new ArgumentException("Năm sử dụng không lớn hơn năm hiện tại.");
 
@@ -51,7 +50,7 @@ public abstract class Device
 // 2. Interface INetworkable
 public interface INetworkable
 {
-    string? IpAddress { get; } // Bổ sung nullable (string?)
+    string? IpAddress { get; } 
     void Connect(string ipAddress);
     void Disconnect();
     bool IsConnected { get; }
@@ -60,7 +59,7 @@ public interface INetworkable
 // 3. Các lớp dẫn xuất
 public class Computer : Device, INetworkable
 {
-    // Đặt hằng số (const) thay cho magic numbers
+    
     private const decimal BASE_MAINTENANCE_RATE = 0.05m;
     private const decimal GPU_SURCHARGE_RATE = 0.02m;
     private const decimal AGE_SURCHARGE_RATE = 0.01m;
@@ -68,13 +67,13 @@ public class Computer : Device, INetworkable
     public int RamCapacity { get; set; }
     public string ProcessorType { get; set; }
     public bool HasDedicatedGPU { get; set; }
-    public string? IpAddress { get; private set; } // Bổ sung nullable
+    public string? IpAddress { get; private set; } 
     public bool IsConnected { get; private set; }
 
     public Computer(string id, string name, int year, decimal price, DeviceStatus status, int ram, string cpu, bool gpu)
         : base(id, name, year, price, status)
     {
-        if (ram <= 0) throw new ArgumentException("RAM phải lớn hơn 0."); // Thêm validate
+        if (ram <= 0) throw new ArgumentException("RAM phải lớn hơn 0."); 
         RamCapacity = ram;
         ProcessorType = cpu;
         HasDedicatedGPU = gpu;
@@ -84,7 +83,7 @@ public class Computer : Device, INetworkable
     {
         decimal cost = PurchasePrice * BASE_MAINTENANCE_RATE;
         if (HasDedicatedGPU) cost += PurchasePrice * GPU_SURCHARGE_RATE;
-        if (YearsInUse > 5) cost += PurchasePrice * AGE_SURCHARGE_RATE; // Tái sử dụng YearsInUse
+        if (YearsInUse > 5) cost += PurchasePrice * AGE_SURCHARGE_RATE; 
         return cost;
     }
 
@@ -115,14 +114,14 @@ public class Printer : Device
     private const decimal HEAVY_USAGE_SURCHARGE = 500000m;
     private const decimal COLOR_SURCHARGE = 300000m;
 
-    public PrinterType PrinterType { get; set; } // Thay string bằng enum
+    public PrinterType PrinterType { get; set; } 
     public int PagesPrinted { get; set; }
     public bool IsColor { get; set; }
 
     public Printer(string id, string name, int year, decimal price, DeviceStatus status, PrinterType type, int pages, bool isColor)
         : base(id, name, year, price, status)
     {
-        if (pages < 0) throw new ArgumentException("Số trang in không được âm."); // Thêm validate
+        if (pages < 0) throw new ArgumentException("Số trang in không được âm.");
         PrinterType = type;
         PagesPrinted = pages;
         IsColor = isColor;
@@ -137,10 +136,10 @@ public class Printer : Device
     }
 }
 
-// NetworkPrinter kế thừa từ Printer và thực thi INetworkable
+
 public class NetworkPrinter : Printer, INetworkable
 {
-    public string? IpAddress { get; private set; } // Bổ sung nullable
+    public string? IpAddress { get; private set; } 
     public bool IsConnected { get; private set; }
 
     public NetworkPrinter(string id, string name, int year, decimal price, DeviceStatus status, PrinterType type, int pages, bool isColor)
@@ -177,8 +176,8 @@ public class Projector : Device
     public Projector(string id, string name, int year, decimal price, DeviceStatus status, int brightness, int bulbHours)
         : base(id, name, year, price, status)
     {
-        if (brightness < 0) throw new ArgumentException("Độ sáng không được âm."); // Thêm validate
-        if (bulbHours < 0) throw new ArgumentException("Số giờ dùng bóng đèn không được âm."); // Thêm validate
+        if (brightness < 0) throw new ArgumentException("Độ sáng không được âm."); 
+        if (bulbHours < 0) throw new ArgumentException("Số giờ dùng bóng đèn không được âm."); 
         Brightness = brightness;
         BulbHoursUsed = bulbHours;
     }
@@ -198,13 +197,12 @@ public class LabRoom
     public string RoomName { get; set; }
     public int Capacity { get; set; }
 
-    // Đổi tên biến thành _devices cho đúng chuẩn private field
     private List<Device> _devices = new List<Device>();
 
     public LabRoom(string id, string name, int capacity)
     {
-        if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Mã phòng không được rỗng."); // Thêm validate
-        if (capacity <= 0) throw new ArgumentException("Sức chứa phải lớn hơn 0."); // Thêm validate
+        if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Mã phòng không được rỗng."); 
+        if (capacity <= 0) throw new ArgumentException("Sức chứa phải lớn hơn 0."); 
         RoomId = id;
         RoomName = name;
         Capacity = capacity;
@@ -214,7 +212,7 @@ public class LabRoom
     {
         if (device == null) throw new ArgumentNullException(nameof(device), "Thiết bị không được null.");
         if (_devices.Any(d => d.Id == device.Id)) throw new InvalidOperationException("Thiết bị trùng mã.");
-        if (_devices.Count >= Capacity) throw new InvalidOperationException("Phòng đã đạt tối đa sức chứa."); // Validate sức chứa
+        if (_devices.Count >= Capacity) throw new InvalidOperationException("Phòng đã đạt tối đa sức chứa."); 
         _devices.Add(device);
     }
 
@@ -263,7 +261,6 @@ class Program
         var comp1 = new Computer("C1", "PC-1", 2018, 15000000, DeviceStatus.Active, 16, "i5", false);
         var comp2 = new Computer("C2", "PC-2", 2023, 25000000, DeviceStatus.Active, 32, "i7", true);
 
-        // Khởi tạo máy in bằng enum thay vì chuỗi
         var print1 = new Printer("P1", "Laser Print", 2020, 5000000, DeviceStatus.Active, PrinterType.Laser, 120000, false);
         var print2 = new NetworkPrinter("P2", "Color Print", 2022, 8000000, DeviceStatus.Active, PrinterType.Inkjet, 50000, true);
 
@@ -282,14 +279,13 @@ class Program
         print2.Connect("192.168.1.20");
         Console.WriteLine($"IP Máy 2: {comp2.IpAddress}, IP Máy in mạng: {print2.IpAddress}");
 
-        // Test cảnh báo ngắt kết nối
         comp2.Disconnect();
         comp2.Disconnect();
 
         var room2 = new LabRoom("L2", "Lab B", 25);
         room2.AddDevice(print2);
 
-        // Thử thêm trùng mã
+        // Test trùng mã
         try { room1.AddDevice(new Computer("C1", "PC-Trung", 2020, 1000000, DeviceStatus.Active, 8, "i3", false)); }
         catch (InvalidOperationException ex) { Console.WriteLine("Lỗi: " + ex.Message); }
 
